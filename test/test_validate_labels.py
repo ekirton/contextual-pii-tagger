@@ -147,6 +147,59 @@ class TestParseValidationResponse:
         assert results[0].id == examples[0].id
         assert results[0].split == examples[0].split
 
+    def test_positional_fallback_when_all_ids_hallucinated(self):
+        """When LLM returns wrong IDs for all entries, fall back to positional matching (§4.1)."""
+        examples = [_make_example(42), _make_example(43)]
+        # LLM hallucinates sequential IDs instead of actual IDs
+        response = [
+            {"id": "train-00001", "labels": ["LOCATION"], "risk": "MEDIUM",
+             "rationale": "", "valid": True},
+            {"id": "train-00002", "labels": ["LOCATION"], "risk": "MEDIUM",
+             "rationale": "", "valid": True},
+        ]
+        results = parse_validation_response(examples, response)
+        assert len(results) == 2
+        assert results[0].id == "train-00042"
+        assert results[1].id == "train-00043"
+
+    def test_positional_fallback_respects_valid_flag(self):
+        """Positional fallback still honors valid=false to remove examples."""
+        examples = [_make_example(10), _make_example(11)]
+        response = [
+            {"id": "wrong-00001", "labels": ["LOCATION"], "risk": "MEDIUM",
+             "rationale": "", "valid": True},
+            {"id": "wrong-00002", "labels": ["LOCATION"], "risk": "MEDIUM",
+             "rationale": "", "valid": False},
+        ]
+        results = parse_validation_response(examples, response)
+        assert len(results) == 1
+        assert results[0].id == "train-00010"
+
+    def test_no_positional_fallback_when_some_ids_match(self):
+        """Positional fallback only activates when ALL IDs fail to match."""
+        examples = [_make_example(1), _make_example(2), _make_example(3)]
+        response = [
+            {"id": "train-00001", "labels": ["LOCATION"], "risk": "MEDIUM",
+             "rationale": "", "valid": True},
+            {"id": "wrong-id", "labels": ["LOCATION"], "risk": "MEDIUM",
+             "rationale": "", "valid": True},
+            {"id": "train-00003", "labels": ["LOCATION"], "risk": "MEDIUM",
+             "rationale": "", "valid": True},
+        ]
+        results = parse_validation_response(examples, response)
+        # Only the 2 with matching IDs should survive; no positional fallback
+        assert len(results) == 2
+
+    def test_no_positional_fallback_when_length_mismatch(self):
+        """Positional fallback requires response length == input length."""
+        examples = [_make_example(42), _make_example(43)]
+        response = [
+            {"id": "wrong-00001", "labels": ["LOCATION"], "risk": "MEDIUM",
+             "rationale": "", "valid": True},
+        ]
+        results = parse_validation_response(examples, response)
+        assert len(results) == 0
+
     def test_all_results_satisfy_invariants(self):
         examples = [
             _make_example(1, frozenset({SpanLabel.LOCATION}), RiskLevel.MEDIUM, ""),
@@ -168,7 +221,7 @@ class TestValidateLabels:
         mock_urlopen.return_value = _mock_ollama_response(
             _mock_validation_response(examples)
         )
-        results = validate_labels(examples, model="qwen2.5:7b")
+        results = validate_labels(examples, model="qwen2.5:3b")
         assert len(results) == 2
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
@@ -181,7 +234,7 @@ class TestValidateLabels:
             urllib.error.URLError("Connection refused"),
             good_resp,
         ]
-        results = validate_labels(examples, model="qwen2.5:7b")
+        results = validate_labels(examples, model="qwen2.5:3b")
         assert len(results) == 2
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
@@ -191,7 +244,7 @@ class TestValidateLabels:
         examples = [_make_example(1)]
         mock_urlopen.side_effect = urllib.error.URLError("Connection refused")
         with pytest.raises(RuntimeError, match="consecutive|failed"):
-            validate_labels(examples, model="qwen2.5:7b")
+            validate_labels(examples, model="qwen2.5:3b")
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
     def test_empty_result_retries_batch(self, mock_urlopen):
@@ -206,12 +259,12 @@ class TestValidateLabels:
         empty_resp.__exit__ = MagicMock(return_value=False)
         good_resp = _mock_ollama_response(_mock_validation_response(examples))
         mock_urlopen.side_effect = [empty_resp, good_resp]
-        results = validate_labels(examples, model="qwen2.5:7b")
+        results = validate_labels(examples, model="qwen2.5:3b")
         assert len(results) == 1
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
     def test_empty_input_returns_empty(self, mock_urlopen):
-        results = validate_labels([], model="qwen2.5:7b")
+        results = validate_labels([], model="qwen2.5:3b")
         assert results == []
         assert not mock_urlopen.called
 
@@ -223,7 +276,7 @@ class TestValidateLabels:
         mock_urlopen.return_value = _mock_ollama_response(
             _mock_validation_response([llm_ex])
         )
-        results = validate_labels([template_ex, llm_ex], model="qwen2.5:7b")
+        results = validate_labels([template_ex, llm_ex], model="qwen2.5:3b")
         # Both should be in results
         assert len(results) == 2
         # Template example unchanged
@@ -235,6 +288,6 @@ class TestValidateLabels:
     def test_only_template_examples_no_llm_call(self, mock_urlopen):
         """If all examples are template-sourced, no LLM call should be made."""
         examples = [_make_example(1, source="template"), _make_example(2, source="template")]
-        results = validate_labels(examples, model="qwen2.5:7b")
+        results = validate_labels(examples, model="qwen2.5:3b")
         assert len(results) == 2
         assert not mock_urlopen.called

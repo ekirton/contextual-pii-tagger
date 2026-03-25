@@ -18,7 +18,7 @@ Configuration for the generation pipeline.
 | `template_fraction` | float | 0.5 | 0.0 < x < 1.0; fraction of non-hard-negative examples from templates |
 | `hard_negative_ratio` | float | 0.10 | 0.0 <= x < 1.0 |
 | `seed` | integer \| None | None | Random seed for reproducibility |
-| `model` | string | "qwen2.5:7b" | Ollama model tag |
+| `model` | string | "qwen2.5:3b" | Ollama model tag |
 | `ollama_base_url` | string | "http://localhost:11434" | Ollama API base URL |
 | `output_dir` | string | "data/" | Writable directory for output files |
 
@@ -138,7 +138,7 @@ generate_from_llm(count: integer, model: string, seed: integer | None) -> list<R
 
 **REQUIRES:**
 - `count` > 0.
-- `model` is a valid Ollama model tag (e.g., `"qwen2.5:7b"`).
+- `model` is a valid Ollama model tag (e.g., `"qwen2.5:3b"`).
 - Ollama is running and the model is available.
 
 **ENSURES:**
@@ -186,6 +186,11 @@ validate_labels(examples: list<Example>, model: string) -> list<Example>
 - Rationale is generated for examples with risk MEDIUM or HIGH.
 - Examples where the validation pass disagrees with the original and cannot be resolved are removed (and must be regenerated to meet count targets).
 - Returns all examples: template-sourced (unchanged) + validated LLM-sourced.
+
+**Response matching:** The validation response is an array whose entries correspond to the input batch. Each entry includes an `id` field. The parser matches response entries to input examples as follows:
+1. **ID match (primary):** Look up the entry's `id` in the input batch. If found, apply the validation result to that example.
+2. **Positional fallback:** If the response array has the same length as the input batch and every `id` in the response fails to match any input example, match entries by position (response index `i` maps to input index `i`).
+3. **Unmatched entries:** Response entries that match neither by ID nor by position are logged and discarded. Input examples with no matching response entry are removed (treated as unresolvable).
 
 **MAINTAINS:**
 - LLM calls use the Ollama `/api/chat` endpoint with `format: "json"`.

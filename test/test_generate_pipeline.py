@@ -51,7 +51,7 @@ class TestGenerationConfig:
         assert config.total_count == 20000
         assert config.template_fraction == 0.5
         assert config.hard_negative_ratio == 0.10
-        assert config.model == "qwen2.5:7b"
+        assert config.model == "qwen2.5:3b"
 
     def test_custom_count(self, tmp_path: Path):
         config = GenerationConfig(templates_dir=str(tmp_path), total_count=100)
@@ -337,6 +337,50 @@ class TestGenerateDataset:
         mock_urlopen.side_effect = _dispatcher_with_validation_loss
         dataset = generate_dataset(config)
         assert len(dataset) == 100
+
+    @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
+    def test_recovery_with_single_example_remaining(self, mock_urlopen, tmp_path):
+        """Recovery must not crash when only 1 example remains (t_count rounds to 0)."""
+        templates_dir = _setup_template_dir(tmp_path)
+        output_dir = tmp_path / "output"
+        config = GenerationConfig(
+            templates_dir=str(templates_dir),
+            total_count=20,
+            seed=42,
+            output_dir=str(output_dir),
+        )
+
+        call_count = {"validation": 0}
+
+        def _dispatcher_leaving_one_short(req, **kwargs):
+            payload = json.loads(req.data)
+            prompt = payload["messages"][0]["content"]
+
+            if "hard negative" in prompt.lower() or "not personally" in prompt.lower():
+                return _make_ollama_response(_mock_hard_negative_texts(30))
+            elif "labeling validator" in prompt.lower() or "verify" in prompt.lower():
+                call_count["validation"] += 1
+                try:
+                    examples_data = _extract_examples_from_validation_prompt(prompt)
+                    if call_count["validation"] == 1:
+                        # First validation: drop exactly 1 example to leave deficit=1
+                        keep = examples_data[1:]
+                    else:
+                        keep = examples_data
+                    response = [
+                        {"id": ex["id"], "labels": ex["labels"],
+                         "risk": ex["risk"], "rationale": ex["rationale"], "valid": True}
+                        for ex in keep
+                    ]
+                except (ValueError, json.JSONDecodeError):
+                    response = []
+                return _make_ollama_response(response)
+            else:
+                return _make_ollama_response(_mock_llm_response(50))
+
+        mock_urlopen.side_effect = _dispatcher_leaving_one_short
+        dataset = generate_dataset(config)
+        assert len(dataset) == 20
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen",
            side_effect=_ollama_dispatcher)

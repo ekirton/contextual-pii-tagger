@@ -66,55 +66,91 @@ Example output for 1 example:
 Return one entry per input example. Each element MUST be a JSON object, never a plain string."""
 
 
+def _apply_entry(original: Example, entry: dict[str, Any]) -> Example | None:
+    """Apply a single validation entry to an example. Returns None if invalid."""
+    if not entry.get("valid", True):
+        logger.info("Removing invalid example: %s", original.id)
+        return None
+
+    try:
+        labels = frozenset(SpanLabel(lbl) for lbl in entry.get("labels", []))
+        risk = RiskLevel(entry.get("risk", original.risk.value))
+        rationale = entry.get("rationale", original.rationale)
+
+        return Example(
+            id=original.id,
+            text=original.text,
+            labels=labels,
+            risk=risk,
+            rationale=rationale,
+            is_hard_negative=original.is_hard_negative,
+            split=original.split,
+            domain=original.domain,
+            source=original.source,
+        )
+    except (ValueError, KeyError) as exc:
+        logger.warning("Skipping malformed validation entry: %s", exc)
+        return None
+
+
 def parse_validation_response(
     examples: list[Example],
     response: list[dict[str, Any]],
 ) -> list[Example]:
-    """Apply validation corrections, removing invalid examples."""
-    examples_by_id = {ex.id: ex for ex in examples}
-    results: list[Example] = []
+    """Apply validation corrections, removing invalid examples.
 
+    Matching strategy (spec §4.1 Response matching):
+    1. ID match (primary): look up entry's id in the input batch.
+    2. Positional fallback: if response length == input length and ALL ids
+       fail to match, map entries by position.
+    3. Unmatched entries are discarded; unmatched input examples are removed.
+    """
+    # Filter to dict entries only
+    dict_entries: list[dict[str, Any]] = []
     for entry in response:
-        if not isinstance(entry, dict):
+        if isinstance(entry, dict):
+            dict_entries.append(entry)
+        else:
             logger.warning("Skipping non-dict validation entry: %s", type(entry).__name__)
+
+    examples_by_id = {ex.id: ex for ex in examples}
+
+    # Check if any IDs match
+    id_match_count = sum(
+        1 for entry in dict_entries if entry.get("id") in examples_by_id
+    )
+
+    # Positional fallback: all IDs missed and response length matches input
+    if id_match_count == 0 and len(dict_entries) == len(examples):
+        logger.info(
+            "All %d response IDs unrecognized; using positional fallback",
+            len(dict_entries),
+        )
+        results: list[Example] = []
+        for original, entry in zip(examples, dict_entries):
+            corrected = _apply_entry(original, entry)
+            if corrected is not None:
+                results.append(corrected)
+        return results
+
+    # Primary path: match by ID
+    results = []
+    for entry in dict_entries:
+        ex_id = entry.get("id")
+        if ex_id not in examples_by_id:
+            logger.warning("Validation response references unknown id: %s", ex_id)
             continue
-        try:
-            ex_id = entry.get("id")
-            if ex_id not in examples_by_id:
-                logger.warning("Validation response references unknown id: %s", ex_id)
-                continue
 
-            if not entry.get("valid", True):
-                logger.info("Removing invalid example: %s", ex_id)
-                continue
-
-            original = examples_by_id[ex_id]
-            labels = frozenset(SpanLabel(lbl) for lbl in entry.get("labels", []))
-            risk = RiskLevel(entry.get("risk", original.risk.value))
-            rationale = entry.get("rationale", original.rationale)
-
-            corrected = Example(
-                id=original.id,
-                text=original.text,
-                labels=labels,
-                risk=risk,
-                rationale=rationale,
-                is_hard_negative=original.is_hard_negative,
-                split=original.split,
-                domain=original.domain,
-                source=original.source,
-            )
+        corrected = _apply_entry(examples_by_id[ex_id], entry)
+        if corrected is not None:
             results.append(corrected)
-        except (ValueError, KeyError) as exc:
-            logger.warning("Skipping malformed validation entry: %s", exc)
-            continue
 
     return results
 
 
 def validate_labels(
     examples: list[Example],
-    model: str = "qwen2.5:7b",
+    model: str = "qwen2.5:3b",
 ) -> list[Example]:
     """Validate and correct labels using a second LLM pass.
 

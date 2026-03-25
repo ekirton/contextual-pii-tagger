@@ -30,7 +30,7 @@ class GenerationConfig:
     template_fraction: float = 0.5
     hard_negative_ratio: float = 0.10
     seed: int | None = None
-    model: str = "qwen2.5:7b"
+    model: str = "qwen2.5:3b"
     output_dir: str = "data/"
 
     def __post_init__(self) -> None:
@@ -169,17 +169,27 @@ def generate_dataset(config: GenerationConfig) -> list[Example]:
         t_count = round(generation_remaining * config.template_fraction)
         l_count = generation_remaining - t_count
 
+        # Ensure at least 1 for each source when both would be needed,
+        # but skip a source entirely when rounding yields 0.
         # Stage 1: Template-based generation
-        logger.info("Stage 1: Generating %d examples from templates...", t_count)
-        template_examples = generate_from_templates(
-            config.templates_dir, t_count, seed=config.seed
-        )
+        if t_count > 0:
+            logger.info("Stage 1: Generating %d examples from templates...", t_count)
+            template_examples = generate_from_templates(
+                config.templates_dir, t_count, seed=config.seed
+            )
+        else:
+            logger.info("Stage 1: Skipping templates (count rounds to 0)")
+            template_examples = []
 
         # Stage 2: LLM-augmented generation
-        logger.info("Stage 2: Generating %d examples from LLM...", l_count)
-        llm_examples = generate_from_llm(
-            count=l_count, model=config.model, seed=config.seed
-        )
+        if l_count > 0:
+            logger.info("Stage 2: Generating %d examples from LLM...", l_count)
+            llm_examples = generate_from_llm(
+                count=l_count, model=config.model, seed=config.seed
+            )
+        else:
+            logger.info("Stage 2: Skipping LLM generation (count rounds to 0)")
+            llm_examples = []
 
         # Combine and assign splits/IDs (continuing from existing max IDs)
         all_raw = template_examples + llm_examples
