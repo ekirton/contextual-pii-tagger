@@ -1,0 +1,61 @@
+domain: "workplace"
+patterns:
+  - text: "I work in the {DEPARTMENT} department at {COMPANY}"
+    labels: ["WORKPLACE"]
+    risk: "LOW"
+    rationale_template: ""
+
+  - text: "Our office is on the {FLOOR} floor of {BUILDING} in {CITY}"
+    labels: ["WORKPLACE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Specific floor, building, and city narrow workplace location."
+
+  - text: "There are about {AGE} people in the {DEPARTMENT} team at {COMPANY}"
+    labels: ["WORKPLACE", "DEMOGRAPHIC"]
+    risk: "MEDIUM"
+    rationale_template: "Team size and department narrow workplace identity."
+
+  - text: "My manager in {DEPARTMENT} at {COMPANY} is based in {CITY}"
+    labels: ["WORKPLACE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Department, company, and city narrow workplace context."
+
+  - text: "I transferred from the {CITY} office to the {CITY} branch"
+    labels: ["WORKPLACE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Transfer between named cities narrows career history."
+
+  - text: "The {DEPARTMENT} team sits near {BUILDING} on floor {FLOOR}"
+    labels: ["WORKPLACE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Department, building, and floor narrow physical workspace."
+
+  - text: "As a {JOB_TITLE} in {DEPARTMENT} at {COMPANY}, I report to the {CITY} office"
+    labels: ["WORKPLACE", "LOCATION", "DEMOGRAPHIC"]
+    risk: "HIGH"
+    rationale_template: "Job title, department, company, and city together significantly narrow identity."
+
+  - text: "I'm the only {ETHNICITY} {JOB_TITLE} in our {CITY} office"
+    labels: ["WORKPLACE", "DEMOGRAPHIC", "LOCATION"]
+    risk: "HIGH"
+    rationale_template: "Ethnicity, role, and city create a highly unique combination."
+
+  - text: "The {COMPANY} campus in {STATE} has about {AGE} employees in {DEPARTMENT}"
+    labels: ["WORKPLACE", "LOCATION", "DEMOGRAPHIC"]
+    risk: "HIGH"
+    rationale_template: "Company, state, headcount, and department narrow significantly."
+
+  - text: "I badge into {BUILDING} every morning for my {JOB_TITLE} role"
+    labels: ["WORKPLACE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Building access and job role narrow workplace identity."
+
+  - text: "Our {DEPARTMENT} offsite is in {CITY} every {MONTH}"
+    labels: ["WORKPLACE", "LOCATION", "ROUTINE"]
+    risk: "MEDIUM"
+    rationale_template: "Department offsite location and schedule reveal workplace pattern."
+
+  - text: "I'm a {AGE}-year-old {JOB_TITLE} at {COMPANY}"
+    labels: ["WORKPLACE", "DEMOGRAPHIC"]
+    risk: "MEDIUM"
+    rationale_template: "Age and job title at a specific company narrow identity."

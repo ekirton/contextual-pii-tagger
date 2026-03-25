@@ -1,0 +1,28 @@
+# Training configuration for contextual-pii-tagger QLoRA fine-tuning.
+#
+# Spec: specifications/training.md §3
+
+base_model: microsoft/Phi-3-mini-4k-instruct
+
+# Quantization (bitsandbytes)
+load_in_4bit: true
+bnb_4bit_compute_dtype: bfloat16
+bnb_4bit_quant_type: nf4
+
+# LoRA
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_modules: [q_proj, v_proj, k_proj, o_proj]
+
+# Training
+num_train_epochs: 3
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4
+learning_rate: 2.0e-4
+lr_scheduler_type: cosine
+warmup_ratio: 0.05
+max_seq_length: 1024
+
+# Output
+output_dir: ./output/contextual-pii-tagger

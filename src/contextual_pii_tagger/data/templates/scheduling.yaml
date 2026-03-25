@@ -1,0 +1,61 @@
+domain: "scheduling"
+patterns:
+  - text: "I take the {BUS_ROUTE} to work every {DAY_OF_WEEK} at {TIME}"
+    labels: ["ROUTINE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Bus route, day, and time reveal commute pattern."
+
+  - text: "I drop the kids at {SCHOOL} by {TIME} every morning"
+    labels: ["ROUTINE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "School name and drop-off time reveal family schedule."
+
+  - text: "My gym class in {NEIGHBORHOOD} starts at {TIME} on {DAY_OF_WEEK}"
+    labels: ["ROUTINE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Neighborhood gym and schedule narrow location and habits."
+
+  - text: "I walk through {NEIGHBORHOOD} to get coffee every {FREQUENCY}"
+    labels: ["ROUTINE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Regular walking route and frequency reveal daily pattern."
+
+  - text: "The {DAY_OF_WEEK} farmers market in {CITY} is my weekly stop"
+    labels: ["ROUTINE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Weekly market visit in a named city reveals schedule and location."
+
+  - text: "I commute from {CITY} to {CITY} {FREQUENCY}"
+    labels: ["ROUTINE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Two cities and frequency reveal commute pattern."
+
+  - text: "My lunch break is at {TIME} and I usually go to {NEIGHBORHOOD}"
+    labels: ["ROUTINE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Lunch time and neighborhood narrow daily location pattern."
+
+  - text: "Every {DAY_OF_WEEK} I have a meeting at the {BUILDING} office"
+    labels: ["ROUTINE", "LOCATION", "WORKPLACE"]
+    risk: "MEDIUM"
+    rationale_template: "Recurring meeting day and office building reveal schedule and workplace."
+
+  - text: "I pick up groceries at {LOCATION} every {DAY_OF_WEEK} evening"
+    labels: ["ROUTINE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Grocery location and day reveal weekly pattern."
+
+  - text: "The {SCHOOL} dismissal is at {TIME} so I leave work early on {DAY_OF_WEEK}"
+    labels: ["ROUTINE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "School dismissal time and day reveal parental schedule."
+
+  - text: "I jog through {NEIGHBORHOOD} every morning before {TIME}"
+    labels: ["ROUTINE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Morning jog route and time reveal exercise pattern."
+
+  - text: "I catch the {TIME} train from {CITY} every weekday"
+    labels: ["ROUTINE", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Specific train time and departure city reveal commute."

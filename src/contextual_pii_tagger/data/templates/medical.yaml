@@ -1,0 +1,61 @@
+domain: "medical"
+patterns:
+  - text: "I saw my {SPECIALTY} at {HOSPITAL} last {DAY_OF_WEEK}"
+    labels: ["MEDICAL-CONTEXT", "WORKPLACE", "ROUTINE"]
+    risk: "MEDIUM"
+    rationale_template: "Medical specialty and specific hospital narrow identification."
+
+  - text: "My {CONDITION} checkup at {CLINIC} is every {FREQUENCY}"
+    labels: ["MEDICAL-CONTEXT", "WORKPLACE", "ROUTINE"]
+    risk: "MEDIUM"
+    rationale_template: "Condition and recurring clinic visits reveal health status and schedule."
+
+  - text: "I picked up {MEDICATION} from the pharmacy on {DAY_OF_WEEK}"
+    labels: ["MEDICAL-CONTEXT", "ROUTINE"]
+    risk: "MEDIUM"
+    rationale_template: "Specific medication and pickup day narrow health profile and schedule."
+
+  - text: "I have a standing appointment with Dr. {FIRST_NAME} at {HOSPITAL}"
+    labels: ["MEDICAL-CONTEXT", "WORKPLACE"]
+    risk: "MEDIUM"
+    rationale_template: "Named doctor and hospital narrow the care relationship."
+
+  - text: "The {SPECIALTY} on the {FLOOR} floor of {HOSPITAL} ran my labs"
+    labels: ["MEDICAL-CONTEXT", "WORKPLACE"]
+    risk: "MEDIUM"
+    rationale_template: "Specialty and specific hospital floor narrow care location."
+
+  - text: "My {CONDITION} treatment is at {CLINIC} in {CITY}"
+    labels: ["MEDICAL-CONTEXT", "WORKPLACE", "LOCATION"]
+    risk: "HIGH"
+    rationale_template: "Condition, clinic, and city together significantly narrow identity."
+
+  - text: "I log into {HOSPITAL}'s patient portal with username {USERNAME}"
+    labels: ["MEDICAL-CONTEXT", "CREDENTIAL"]
+    risk: "MEDIUM"
+    rationale_template: "Hospital portal username links medical context to a credential."
+
+  - text: "Every {DAY_OF_WEEK} I take the {BUS_ROUTE} to my {SPECIALTY} appointment"
+    labels: ["MEDICAL-CONTEXT", "ROUTINE", "LOCATION"]
+    risk: "HIGH"
+    rationale_template: "Weekly commute route to a specialist narrows location and health profile."
+
+  - text: "My therapist at {CLINIC} suggested I see a {SPECIALTY}"
+    labels: ["MEDICAL-CONTEXT", "WORKPLACE"]
+    risk: "MEDIUM"
+    rationale_template: "Therapy relationship and referral narrow mental health context."
+
+  - text: "I was referred to {HOSPITAL} for {CONDITION} management"
+    labels: ["MEDICAL-CONTEXT", "WORKPLACE"]
+    risk: "MEDIUM"
+    rationale_template: "Referral to named hospital for a specific condition."
+
+  - text: "The nurse at {CLINIC} takes my vitals every {FREQUENCY}"
+    labels: ["MEDICAL-CONTEXT", "WORKPLACE", "ROUTINE"]
+    risk: "MEDIUM"
+    rationale_template: "Regular visits to a specific clinic reveal health schedule."
+
+  - text: "I bring my {DEVICE_MODEL} to track vitals during my {SPECIALTY} visits"
+    labels: ["MEDICAL-CONTEXT", "DEVICE-ID"]
+    risk: "MEDIUM"
+    rationale_template: "Device model linked to specialist visits narrows health context."

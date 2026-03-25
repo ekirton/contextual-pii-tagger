@@ -1,0 +1,61 @@
+domain: "personal"
+patterns:
+  - text: "I live in {NEIGHBORHOOD} near {CITY}"
+    labels: ["LOCATION"]
+    risk: "LOW"
+    rationale_template: ""
+
+  - text: "I'm a {AGE}-year-old from {CITY}, {STATE}"
+    labels: ["LOCATION", "DEMOGRAPHIC"]
+    risk: "MEDIUM"
+    rationale_template: "Age and city-state combination narrow identity."
+
+  - text: "I walk my dog through {NEIGHBORHOOD} every {DAY_OF_WEEK}"
+    labels: ["LOCATION", "ROUTINE"]
+    risk: "MEDIUM"
+    rationale_template: "Neighborhood and weekly dog-walking day reveal pattern."
+
+  - text: "My family has lived in {CITY} for {YEAR} years"
+    labels: ["LOCATION", "DEMOGRAPHIC"]
+    risk: "MEDIUM"
+    rationale_template: "Long-term city residence narrows family identity."
+
+  - text: "I'm {ETHNICITY} and grew up in {CITY}"
+    labels: ["LOCATION", "DEMOGRAPHIC"]
+    risk: "MEDIUM"
+    rationale_template: "Ethnicity and hometown narrow background."
+
+  - text: "My {DEVICE_MODEL} serial number is {DEVICE_ID}"
+    labels: ["DEVICE-ID"]
+    risk: "LOW"
+    rationale_template: ""
+
+  - text: "I use {USERNAME} for most of my online accounts"
+    labels: ["CREDENTIAL"]
+    risk: "LOW"
+    rationale_template: ""
+
+  - text: "I attend {RELIGION} services in {NEIGHBORHOOD} every {DAY_OF_WEEK}"
+    labels: ["LOCATION", "ROUTINE", "DEMOGRAPHIC"]
+    risk: "HIGH"
+    rationale_template: "Religion, neighborhood, and weekly attendance create a unique combination."
+
+  - text: "I'm a {AGE}-year-old {ETHNICITY} {JOB_TITLE} living in {CITY}"
+    labels: ["LOCATION", "DEMOGRAPHIC", "QUASI-ID"]
+    risk: "HIGH"
+    rationale_template: "Age, ethnicity, job, and city combine into a quasi-identifier."
+
+  - text: "My neighbors in {NEIGHBORHOOD} know me as the {JOB_TITLE} who walks at {TIME}"
+    labels: ["LOCATION", "ROUTINE", "DEMOGRAPHIC"]
+    risk: "HIGH"
+    rationale_template: "Neighborhood reputation, job, and schedule highly narrow identity."
+
+  - text: "I log into my neighborhood app with {USERNAME} and check {NEIGHBORHOOD} updates"
+    labels: ["CREDENTIAL", "LOCATION"]
+    risk: "MEDIUM"
+    rationale_template: "Username linked to a specific neighborhood narrows identity."
+
+  - text: "My {DEVICE_MODEL} connects to the Wi-Fi at {LOCATION} every {DAY_OF_WEEK}"
+    labels: ["DEVICE-ID", "LOCATION", "ROUTINE"]
+    risk: "HIGH"
+    rationale_template: "Device, location, and weekly pattern create a tracking fingerprint."
