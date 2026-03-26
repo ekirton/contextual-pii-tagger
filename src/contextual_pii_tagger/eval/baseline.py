@@ -39,6 +39,19 @@ _PHONE_RE = re.compile(r"\b\d{3}[-.]?\d{3}[-.]?\d{4}\b")
 _ADDRESS_RE = re.compile(r"\b\d+\s+[A-Z][a-z]+\s+(?:St|Ave|Rd|Blvd|Dr|Ln)\b")
 _CRED_RE = re.compile(r"\b(?:sk-[A-Za-z0-9]+|api[_-]?key|password|token)\b", re.IGNORECASE)
 
+# Cached spaCy model — loaded once on first use to avoid per-call overhead
+_spacy_nlp: object | None = None
+
+
+def _get_spacy_nlp():
+    """Return the cached spaCy pipeline, loading it on first call."""
+    global _spacy_nlp
+    if _spacy_nlp is None:
+        import spacy
+
+        _spacy_nlp = spacy.load("en_core_web_sm")
+    return _spacy_nlp
+
 
 def extract_features(text: str) -> dict:
     """Compute a feature dict from *text*.
@@ -66,9 +79,7 @@ def extract_features(text: str) -> dict:
 
     # Entity counts from spaCy (if available)
     try:
-        import spacy
-
-        nlp = spacy.load("en_core_web_sm")
+        nlp = _get_spacy_nlp()
         doc = nlp(text)
         ent_counts = {"PERSON": 0, "ORG": 0, "GPE": 0, "DATE": 0}
         for ent in doc.ents:
