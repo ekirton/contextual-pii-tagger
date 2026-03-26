@@ -11,7 +11,7 @@ The evaluation pipeline measures detection quality for both the fine-tuned model
 ```
                           ┌──────────────────┐
                           │    Test Split     │
-                          │ (5,000 Examples)  │
+                          │ (1,243 Examples)  │
                           └────────┬─────────┘
                                    │
                           ┌────────┴─────────┐
@@ -69,11 +69,11 @@ The baseline does not produce a rationale — this field is left empty in its pr
 
 ### Training
 
-The XGBoost classifier is trained on the same 40,000 training examples using the extracted features. Hyperparameters are tuned via cross-validation on the training set (not the validation split, which is reserved for the fine-tuned model's training monitoring).
+The XGBoost classifier is trained on the same ~10,000 training examples using the extracted features. Hyperparameters are tuned via cross-validation on the training set (not the validation split, which is reserved for the fine-tuned model's training monitoring).
 
 ## 4. Metrics
 
-All metrics are computed on the test split (5,000 Examples) for both models.
+All metrics are computed on the test split (1,243 Examples) for both models.
 
 ### 4.1 Multilabel F1
 

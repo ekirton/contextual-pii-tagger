@@ -110,7 +110,7 @@ The merged variant is produced after training as an export step. It enables infe
 
 ## 8. Validation During Training
 
-At the end of each epoch, the training pipeline evaluates on the validation split (5,000 examples) and reports:
+At the end of each epoch, the training pipeline evaluates on the validation split (1,257 examples) and reports:
 - Validation loss
 - Multilabel F1 (aggregate)
 - Risk score accuracy

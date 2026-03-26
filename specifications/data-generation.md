@@ -13,7 +13,7 @@ Configuration for the generation pipeline.
 | Field | Type | Default | Constraints |
 |-------|------|---------|-------------|
 | `templates_dir` | string | — | Path to YAML template directory |
-| `total_count` | integer | 20000 | > 0 |
+| `total_count` | integer | 12500 | > 0 |
 | `template_fraction` | float | 0.5 | 0.0 < x < 1.0; fraction of non-hard-negative examples from templates |
 | `hard_negative_ratio` | float | 0.10 | 0.0 <= x < 1.0 |
 | `seed` | integer \| None | None | Random seed for reproducibility |

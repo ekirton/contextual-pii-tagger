@@ -15,7 +15,7 @@ No name appears, yet this uniquely identifies someone. Every PII detector on the
 ## Method
 
 - **Approach:** QLoRA fine-tuned Phi-3 Mini (3.8B) compared against an XGBoost classifier over spaCy embeddings
-- **Training data:** 50,000 synthetically generated examples with human spot-checking
+- **Training data:** 12,500 synthetically generated examples with human spot-checking
 - **Scope:** Tier 2 quasi-identifiers only (see [PII Tier Classification](doc/pii-tiers.md))
 
 ## Evaluation Results

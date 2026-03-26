@@ -28,13 +28,13 @@ Output: train.jsonl, validation.jsonl, test.jsonl
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `total_count` | 50,000 | Target dataset size |
+| `total_count` | 12,500 | Target dataset size |
 | `template_fraction` | 0.5 | Proportion from templates vs. LLM |
 | `hard_negative_ratio` | 0.10 | Hard negatives as fraction of each split |
 | `seed` | None | Random seed for reproducibility |
 | `model` | sonnet | Claude model for LLM stages |
 
-With defaults: 22,500 template examples + 22,500 LLM examples = 45,000 non-hard-negative examples, plus ~5,556 hard negatives injected post-split, yielding ~50,556 total.
+With defaults: ~5,625 template examples + ~5,625 LLM examples = ~11,250 non-hard-negative examples, plus ~1,250 hard negatives injected post-split, yielding ~12,500 total.
 
 ### 1.3 Stage 1: Template-Based Generation
 
@@ -108,7 +108,7 @@ After split assignment, examples within each split are shuffled again to remove 
 
 ### 2.3 Memory Considerations
 
-Each example is ~300 bytes in memory (200B text + 100B metadata). At 50,000 examples the full dataset is ~15 MB — trivially fits in RAM. Reservoir sampling or streaming approaches are unnecessary below several million examples.
+Each example is ~300 bytes in memory (200B text + 100B metadata). At 12,500 examples the full dataset is ~4 MB — trivially fits in RAM. Reservoir sampling or streaming approaches are unnecessary below several million examples.
 
 ---
 
@@ -189,15 +189,15 @@ The effective update to each attention weight is `ΔW = (α/r) × BA`, where `B 
 
 ### 4.5 Effective Training Statistics
 
-With 40,000 train examples (post-validation, pre-hard-negative), effective batch size 16, and 3 epochs:
+With ~10,000 train examples, effective batch size 16, and 3 epochs:
 
 | Metric | Value |
 |--------|-------|
-| Steps per epoch | ceil(40,000 / 16) = 2,500 |
-| Total optimization steps | 7,500 |
-| Warmup steps | 375 |
-| Learning rate at step 375 | 2 × 10⁻⁴ (peak) |
-| Learning rate at step 7,500 | ~0 (cosine minimum) |
+| Steps per epoch | ceil(10,000 / 16) = 625 |
+| Total optimization steps | 1,875 |
+| Warmup steps | 94 |
+| Learning rate at step 94 | 2 × 10⁻⁴ (peak) |
+| Learning rate at step 1,875 | ~0 (cosine minimum) |
 
 ---
 

@@ -52,7 +52,7 @@ prepare_dataset(dataset_path: string, tokenizer: Tokenizer) -> FormattedDataset
 Loads and formats the training split for the training loop.
 
 **REQUIRES:**
-- `dataset_path` points to a directory containing `train.jsonl` (40,000 Example records).
+- `dataset_path` points to a directory containing `train.jsonl`.
 - `tokenizer` is a loaded Phi-3 tokenizer.
 
 **ENSURES:**
@@ -125,7 +125,7 @@ Runs validation at the end of each training epoch.
 
 **REQUIRES:**
 - `model` is the current state of the model (base + adapter after N epochs).
-- `validation_dataset` is the formatted validation split (5,000 examples).
+- `validation_dataset` is the formatted validation split.
 
 **ENSURES:**
 - Returns EpochMetrics containing:

@@ -14,7 +14,7 @@ Implement `write_dataset(dataset, output_dir)` and `read_dataset(input_dir) -> l
 
 2. **read_dataset** — Read JSONL files back into Example records. Validate each record on load.
 
-3. **Split validation** — Verify expected counts on write: 40,000 train, 5,000 validation, 5,000 test.
+3. **Split validation** — Verify expected split proportions (approximately 80:10:10) on write.
 
 ## Acceptance Criteria
 

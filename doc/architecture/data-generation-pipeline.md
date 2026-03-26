@@ -6,7 +6,7 @@
 
 ## 1. Pipeline Overview
 
-The data generation pipeline produces 20,000 Example records through five sequential stages. Each stage takes the output of the previous stage as input, progressively building and refining the dataset.
+The data generation pipeline produces 12,500 Example records through five sequential stages. Each stage takes the output of the previous stage as input, progressively building and refining the dataset.
 
 ```
 ┌────────────┐    ┌────────────┐    ┌────────────┐    ┌────────────┐    ┌────────────┐
@@ -133,8 +133,8 @@ The final dataset is a single file (or set of split files) containing Example re
 ## 8. Split Assignment
 
 After all examples are generated, they are shuffled and assigned to splits:
-- **Train:** 16,000 examples (80%)
-- **Validation:** 2,000 examples (10%)
-- **Test:** 2,000 examples (10%)
+- **Train:** ~10,000 examples (80%)
+- **Validation:** ~1,250 examples (10%)
+- **Test:** ~1,250 examples (10%)
 
 Split assignment happens before human review so that the review sample is drawn proportionally from all splits.

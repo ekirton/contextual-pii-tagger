@@ -4,7 +4,7 @@
 
 ## What This Feature Does
 
-Produces the complete training dataset for the model — 20,000 synthetically generated examples of free text, each labeled with the quasi-identifier categories present and risk scores. The dataset is split 80:10:10 into train (16,000), validation (2,000), and test (2,000) partitions.
+Produces the complete training dataset for the model — 12,500 synthetically generated examples of free text, each labeled with the quasi-identifier categories present and risk scores. The dataset is split approximately 80:10:10 into train (~10,000), validation (~1,250), and test (~1,250) partitions.
 
 Each split includes 10% hard negatives: text that mentions places, times, organizations, or other details that look like quasi-identifiers but are not PII in context (e.g., historical references, fictional characters, public figures discussed in public contexts).
 
@@ -18,7 +18,7 @@ Hard negatives are essential because without them the model would learn to flag 
 
 - Synthetic data may not capture the full diversity of real-world prompts. This is partially mitigated by using multiple generation approaches (templates and LLM-augmented generation) and by including diverse domains (medical, scheduling, workplace, personal).
 - 10% hard negatives is a starting ratio. If evaluation reveals excessive false positives, the ratio may need to increase — but this is a tuning decision, not a feature change.
-- The 80:10:10 split is standard. The validation and test sets are large enough (2,000 each) to provide statistically meaningful evaluation results.
+- The 80:10:10 split is standard. The validation and test sets are large enough (~1,250 each) to provide statistically meaningful evaluation results.
 
 ## What This Feature Does Not Provide
 
@@ -32,7 +32,7 @@ Hard negatives are essential because without them the model would learn to flag 
 ### AC-01: Dataset size and split
 **GIVEN** the generation pipeline has completed
 **WHEN** the dataset is inspected
-**THEN** it contains 20,000 total examples split into 16,000 train, 2,000 validation, and 2,000 test
+**THEN** it contains 12,500 total examples split approximately 80:10:10 into train, validation, and test
 
 ### AC-02: Hard negatives in every split
 **GIVEN** any single split (train, validation, or test)

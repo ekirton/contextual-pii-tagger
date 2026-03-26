@@ -15,7 +15,7 @@ Top-level function that computes all metrics for a single model.
 **REQUIRES:**
 - `model` implements a `predict(text: string) -> DetectionResult` interface (either the fine-tuned PIIDetector or the XGBoost baseline wrapper).
 - `test_dataset` is a list of valid Example records from the test split.
-- `len(test_dataset)` == 5,000.
+- `len(test_dataset)` > 0.
 
 **ENSURES:**
 - Returns a valid EvaluationReport (satisfies all invariants from entities.md Section 5).
@@ -160,7 +160,7 @@ train_baseline(train_dataset: list<Example>) -> XGBoostPredictor
 ```
 
 **REQUIRES:**
-- `train_dataset` is the training split (40,000 examples).
+- `train_dataset` is the training split.
 
 **ENSURES:**
 - Returns an XGBoostPredictor that implements the `predict(text: string) -> DetectionResult` interface.

@@ -32,7 +32,7 @@ ollama pull qwen2.5:3b
 
 ## 1. Generate the Training Dataset
 
-The pipeline produces 20,000 synthetic examples in an 80:10:10 train/validation/test split across five stages.
+The pipeline produces 12,500 synthetic examples in an 80:10:10 train/validation/test split across five stages.
 
 ### Quick start (template-only, no LLM)
 
@@ -48,7 +48,7 @@ The pipeline produces 20,000 synthetic examples in an 80:10:10 train/validation/
 
 ```bash
 ./scripts/generate-training-data.sh \
-  --count 20000 \
+  --count 12500 \
   --seed 42 \
   --model qwen2.5:3b \
   --template-fraction 0.5 \
@@ -77,9 +77,9 @@ The pipeline produces 20,000 synthetic examples in an 80:10:10 train/validation/
 Three JSONL files in the output directory:
 
 ```
-data/train.jsonl       # 16,000 examples
-data/validation.jsonl  #  2,000 examples
-data/test.jsonl        #  2,000 examples
+data/train.jsonl       # ~10,000 examples
+data/validation.jsonl  #  ~1,250 examples
+data/test.jsonl        #  ~1,250 examples
 ```
 
 Each line is a JSON Example record:

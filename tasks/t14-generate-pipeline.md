@@ -21,7 +21,7 @@ Implement `generate_dataset(config) -> Dataset` orchestrating all five stages.
 
 3. **ID assignment** — Assign IDs in `{split}-{zero-padded-number}` format.
 
-4. **Count verification** — Verify final dataset: 50,000 total, correct split sizes, 10% hard negatives per split.
+4. **Count verification** — Verify final dataset: 12,500 total, correct split sizes, 10% hard negatives per split.
 
 5. **CLI entry point** — Accept config path, run pipeline, write output.
 
