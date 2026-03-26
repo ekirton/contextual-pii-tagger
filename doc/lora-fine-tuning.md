@@ -2,6 +2,8 @@
 
 Technical reference for the contextual PII tagger's data generation pipeline, training procedure, and inference strategy. Intended for a data scientist audience.
 
+> **Outcome:** Evaluation on 1,243 test examples showed the QLoRA fine-tuned model did not significantly outperform an XGBoost baseline (Multilabel F1: 0.8333 vs 0.8347). The project adopted XGBoost as the production model. This document is retained as a reference for the LoRA approach. See [§8 Evaluation Results](#8-evaluation-results) for the full comparison.
+
 ---
 
 ## 1. Data Generation Pipeline
@@ -254,3 +256,38 @@ Post-training, the LoRA adapter weights are merged into the base model:
 4. Save the merged model and tokenizer
 
 The merged model produces identical outputs to base+adapter but requires no adapter-aware loading path at inference time.
+
+---
+
+## 8. Evaluation Results
+
+The fine-tuned LoRA model was compared against an XGBoost baseline (spaCy embeddings) on 1,243 held-out test examples.
+
+### 8.1 Aggregate Metrics
+
+| Metric | LoRA | XGBoost | Delta |
+|--------|------|---------|-------|
+| Multilabel F1 | 0.8333 | 0.8347 | −0.0014 |
+| Risk accuracy | 0.9316 | 0.9292 | +0.0024 |
+| False negative rate | 0.0000 | 0.0206 | −0.0206 |
+| QUASI-ID F1 | 0.5798 | 0.5809 | −0.0011 |
+| Hard negative precision | 1.0000 | 0.9677 | +0.0323 |
+
+### 8.2 Per-Label F1
+
+| Label | LoRA | XGBoost | Delta |
+|-------|------|---------|-------|
+| CREDENTIAL | 0.7047 | 0.7182 | −0.0136 |
+| DEMOGRAPHIC | 0.9156 | 0.9139 | +0.0017 |
+| DEVICE-ID | 0.7813 | 0.7731 | +0.0081 |
+| LOCATION | 0.9587 | 0.9459 | +0.0128 |
+| MEDICAL-CONTEXT | 0.9283 | 0.9275 | +0.0008 |
+| QUASI-ID | 0.5798 | 0.5809 | −0.0011 |
+| ROUTINE | 0.8705 | 0.8855 | −0.0150 |
+| WORKPLACE | 0.9276 | 0.9327 | −0.0051 |
+
+### 8.3 Conclusion
+
+The LoRA model showed marginally better false negative rate (0.00 vs 0.02) and hard negative precision (1.00 vs 0.97), but did not meaningfully outperform XGBoost on the primary multilabel F1 metric. Per-label results were mixed, with no consistent advantage for either model.
+
+Given comparable accuracy, XGBoost was selected as the production model for its simplicity: faster training, no GPU requirement, and straightforward deployment as part of the Rust scanner binary.

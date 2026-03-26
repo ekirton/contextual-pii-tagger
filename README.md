@@ -1,6 +1,6 @@
 # contextual-pii-tagger
 
-A QLoRA fine-tuned small language model that detects **contextual and quasi-identifier PII** in free text — the kind of personally identifiable information that regex tools and NER systems miss entirely.
+Detects **contextual and quasi-identifier PII** in free text — the kind of personally identifiable information that regex tools and NER systems miss entirely.
 
 ## The Problem
 
@@ -14,8 +14,7 @@ No name appears, yet this uniquely identifies someone. Every PII detector on the
 
 ## Method
 
-- **Base model:** Small open-weight instruction-tuned LM (e.g., Phi-3 Mini, 3.8B params)
-- **Technique:** QLoRA fine-tuning (~8M trainable params, runs on a single consumer GPU)
+- **Model:** XGBoost classifier over spaCy embeddings — chosen after evaluation showed it matches a QLoRA fine-tuned LM at a fraction of the cost and complexity (see [Evaluation Results](#evaluation-results))
 - **Training data:** 50,000 synthetically generated examples with human spot-checking
 - **Scope:** Tier 2 quasi-identifiers (custom model); Tier 1 direct identifiers (via redact-core); sensitive context (Tier 3) is out of scope (see [PII Tier Classification](pii-tiers.md))
 
@@ -34,11 +33,27 @@ If quasi-identifier PII is detected, the binary exits with code 2 and writes the
 
 Clean text exits with code 0 and empty stderr.
 
+## Evaluation Results
+
+A QLoRA fine-tuned Phi-3 Mini (3.8B) was compared against an XGBoost baseline on 1,243 held-out test examples. The two models performed within noise of each other:
+
+| Metric | LoRA | XGBoost | Delta |
+|--------|------|---------|-------|
+| Multilabel F1 | 0.8333 | 0.8347 | −0.0014 |
+| Risk accuracy | 0.9316 | 0.9292 | +0.0024 |
+| False negative rate | 0.0000 | 0.0206 | −0.0206 |
+| QUASI-ID F1 | 0.5798 | 0.5809 | −0.0011 |
+| Hard negative precision | 1.0000 | 0.9677 | +0.0323 |
+
+The LoRA model showed a small advantage on false negatives and hard negative precision, but did not meaningfully outperform the baseline on the primary F1 metric. Given the comparable accuracy, XGBoost is the preferred production model — it is simpler to train, faster at inference, and requires no GPU.
+
+Full per-label results are in [`data/comparison-report.txt`](../data/comparison-report.txt). The LoRA fine-tuning methodology is documented in [lora-fine-tuning.md](lora-fine-tuning.md).
+
 ## Deliverables
 
 | Artifact | Description |
 |----------|-------------|
-| QLoRA adapter | Fine-tuned model weights on HuggingFace |
+| XGBoost model | Trained classifier for Tier 2 quasi-identifier detection |
 | Benchmark dataset | 5,000-example human-reviewed test set |
 | Rust scanner binary | `pii-scanner` — combined Tier 1 + Tier 2 detection, no Python required |
 | Claude Code hooks | Privacy gate for prompt submission, tool use, and tool output |
@@ -47,64 +62,22 @@ Clean text exits with code 0 and empty stderr.
 
 ## Installation
 
-Users need three things: the `pii-scanner` binary, a GGUF model file, and Claude Code hook configuration. No Python runtime is required.
+Users need the `pii-scanner` binary and Claude Code hook configuration. No Python runtime or GPU is required.
 
 ### 1. Install system prerequisites
 
-The build compiles llama.cpp from source, which requires a C/C++ toolchain and `libclang`.
-
-| Platform | Command |
-|----------|---------|
-| Ubuntu/Debian | `sudo apt install build-essential cmake libclang-dev` |
-| macOS | `brew install llvm cmake` and `export LIBCLANG_PATH=$(brew --prefix llvm)/lib` |
-| Fedora/RHEL | `sudo dnf install clang-devel cmake gcc-c++` |
-
-You also need a [Rust toolchain](https://rustup.rs/) (1.75+).
-
-Tier 1 only (`--features tier1`) has no C/C++ requirements — it is pure Rust.
+You need a [Rust toolchain](https://rustup.rs/) (1.75+).
 
 ### 2. Build the binary
 
 ```bash
 cd rust
-
-# Full build (Tier 1 + Tier 2)
-cargo build --release --features full
-
-# Or Tier 1 only (no C/C++ toolchain needed)
-cargo build --release --features tier1
+cargo build --release
 ```
 
 The binary is at `rust/target/release/pii-scanner`. Copy it somewhere on your `PATH`.
 
-### 3. Download or convert the model
-
-If a pre-built GGUF model is available, download it to the default location:
-
-```
-~/.cache/contextual-pii-tagger/model.gguf
-```
-
-To convert from safetensors (requires Python — see [DEVELOPMENT.md](DEVELOPMENT.md) for training):
-
-```bash
-git clone https://github.com/ggerganov/llama.cpp.git
-
-python llama.cpp/convert_hf_to_gguf.py \
-    path/to/merged-model/ \
-    --outfile ~/.cache/contextual-pii-tagger/model.gguf \
-    --outtype q4_k_m
-```
-
-To use a different path, set `PII_MODEL_PATH`:
-
-```bash
-export PII_MODEL_PATH=/path/to/model.gguf
-```
-
-This step is not needed if you only use Tier 1 (`--tier1`).
-
-### 4. Enable Claude Code hooks
+### 3. Enable Claude Code hooks
 
 Add the following to `.claude/settings.json` (or `.claude/settings.local.json`). Two hooks per event — Tier 1 runs first (fast, pattern-based), Tier 2 runs second (model inference):
 
