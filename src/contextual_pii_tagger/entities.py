@@ -55,14 +55,13 @@ class DetectionResult:
         if self.risk == RiskLevel.LOW and self.rationale:
             raise ValueError("Risk LOW requires empty rationale")
 
-        # Invariant: MEDIUM/HIGH with 2+ labels → non-empty rationale
+        # Invariant: MEDIUM/HIGH → non-empty rationale
         if (
             self.risk in (RiskLevel.MEDIUM, RiskLevel.HIGH)
-            and len(self.labels) >= 2
             and not self.rationale
         ):
             raise ValueError(
-                "Risk MEDIUM/HIGH with 2+ labels requires non-empty rationale"
+                "Risk MEDIUM/HIGH requires non-empty rationale"
             )
 
     def to_dict(self) -> dict[str, Any]:

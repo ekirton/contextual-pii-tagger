@@ -133,6 +133,42 @@ class TestParseLlmResponse:
         results = parse_llm_response(raw)
         assert len(results) == 1
 
+    def test_skips_medium_single_label_no_rationale(self):
+        """MEDIUM risk with 1 label and empty rationale must be rejected (tightened invariant)."""
+        raw = [{
+            "text": "I visit Dr. Smith every Tuesday.",
+            "labels": ["ROUTINE"],
+            "risk": "MEDIUM",
+            "rationale": "",
+            "domain": "medical",
+        }]
+        results = parse_llm_response(raw)
+        assert len(results) == 0
+
+    def test_accepts_medium_single_label_with_rationale(self):
+        """MEDIUM risk with 1 label and non-empty rationale must be accepted."""
+        raw = [{
+            "text": "I visit Dr. Smith every Tuesday.",
+            "labels": ["ROUTINE"],
+            "risk": "MEDIUM",
+            "rationale": "Weekly schedule reveals routine.",
+            "domain": "medical",
+        }]
+        results = parse_llm_response(raw)
+        assert len(results) == 1
+
+    def test_skips_high_single_label_no_rationale(self):
+        """HIGH risk with 1 label and empty rationale must be rejected."""
+        raw = [{
+            "text": "My government clearance is TS/SCI.",
+            "labels": ["CREDENTIAL"],
+            "risk": "HIGH",
+            "rationale": "",
+            "domain": "workplace",
+        }]
+        results = parse_llm_response(raw)
+        assert len(results) == 0
+
 
 class TestGenerateFromLlm:
     """Integration tests for generate_from_llm with mocked Ollama."""
@@ -140,13 +176,13 @@ class TestGenerateFromLlm:
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
     def test_returns_correct_count(self, mock_urlopen):
         mock_urlopen.return_value = _mock_ollama_response(_mock_llm_response(10))
-        results = generate_from_llm(count=10, model="qwen2.5:7b")
+        results = generate_from_llm(count=10, model="qwen2.5:3b")
         assert len(results) == 10
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
     def test_calls_ollama(self, mock_urlopen):
         mock_urlopen.return_value = _mock_ollama_response(_mock_llm_response(5))
-        generate_from_llm(count=5, model="qwen2.5:7b")
+        generate_from_llm(count=5, model="qwen2.5:3b")
         assert mock_urlopen.called
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
@@ -161,13 +197,13 @@ class TestGenerateFromLlm:
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
     def test_all_results_are_raw_examples(self, mock_urlopen):
         mock_urlopen.return_value = _mock_ollama_response(_mock_llm_response(5))
-        results = generate_from_llm(count=5, model="qwen2.5:7b")
+        results = generate_from_llm(count=5, model="qwen2.5:3b")
         assert all(isinstance(r, RawExample) for r in results)
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
     def test_count_zero_raises(self, mock_urlopen):
         with pytest.raises(ValueError, match="count"):
-            generate_from_llm(count=0, model="qwen2.5:7b")
+            generate_from_llm(count=0, model="qwen2.5:3b")
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
     def test_retries_on_insufficient_results(self, mock_urlopen):
@@ -176,7 +212,7 @@ class TestGenerateFromLlm:
             _mock_ollama_response(_mock_llm_response(3)),
             _mock_ollama_response(_mock_llm_response(5)),
         ]
-        results = generate_from_llm(count=5, model="qwen2.5:7b")
+        results = generate_from_llm(count=5, model="qwen2.5:3b")
         assert len(results) == 5
         assert mock_urlopen.call_count == 2
 
@@ -185,4 +221,4 @@ class TestGenerateFromLlm:
         import urllib.error
         mock_urlopen.side_effect = urllib.error.URLError("Connection refused")
         with pytest.raises(RuntimeError, match="Ollama"):
-            generate_from_llm(count=5, model="qwen2.5:7b")
+            generate_from_llm(count=5, model="qwen2.5:3b")

@@ -24,7 +24,7 @@ def _make_raw_example(domain: str = "medical", label: SpanLabel = SpanLabel.LOCA
         text=f"Example text for {domain}",
         labels=frozenset({label}),
         risk=RiskLevel.MEDIUM,
-        rationale="",
+        rationale="Contextual detail creates re-identification risk.",
         is_hard_negative=False,
         domain=domain,
         source="template",
@@ -143,7 +143,7 @@ def _mock_llm_response(count: int) -> list[dict]:
             "text": f"LLM generated text {i}",
             "labels": [label.value],
             "risk": "MEDIUM",
-            "rationale": "",
+            "rationale": "Contextual detail creates risk.",
             "domain": domains[i % len(domains)],
         })
     return examples

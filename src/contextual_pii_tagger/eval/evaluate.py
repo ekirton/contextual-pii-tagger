@@ -42,8 +42,10 @@ def evaluate(
         - Deterministic: same inputs → same report.
     """
     predictions: list[DetectionResult] = []
-    for ex in test_dataset:
-        predictions.append(model.predict(ex.text))
+    for i, ex in enumerate(test_dataset, 1):
+        result = model.predict(ex.text)
+        print(f"  [{i}/{len(test_dataset)}] labels={set(result.labels)} risk={result.risk.value}")
+        predictions.append(result)
 
     pred_labels = [p.labels for p in predictions]
     gt_labels = [ex.labels for ex in test_dataset]

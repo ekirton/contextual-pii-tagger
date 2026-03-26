@@ -44,7 +44,7 @@ labels, risk level, and rationale are correct.
 
 - Empty labels → risk must be "LOW", rationale must be ""
 - Risk "LOW" → rationale must be ""
-- Risk "MEDIUM" or "HIGH" with 2+ labels → rationale must be non-empty
+- Risk "MEDIUM" or "HIGH" → rationale must be non-empty
 
 ## Examples to validate
 

@@ -49,9 +49,10 @@ The assembled prompt is tokenized using the base model's tokenizer. If the token
 
 The model generates a completion containing the JSON-formatted DetectionResult (category labels, risk level, rationale). Generation uses greedy decoding (temperature 0) for deterministic output.
 
-The model is loaded once at initialization. Two loading modes are supported:
+The model is loaded once at initialization. Three loading modes are supported:
 - **Merged weights:** Single model file, no `peft` dependency. Preferred for deployment.
 - **Base + adapter:** Base model with LoRA adapter applied at load time. Used during development.
+- **4-bit quantized:** On CUDA hardware, the model is loaded in 4-bit NF4 quantization via bitsandbytes, reducing memory from ~8GB to ~3GB and improving inference throughput. On MPS or CPU, the model loads in the native dtype (quantization is not supported on these backends).
 
 ### 2.3 Output Parser
 

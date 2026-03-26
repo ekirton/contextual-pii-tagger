@@ -1,0 +1,21 @@
+=== Model Comparison (1243 test examples) ===
+
+Metric                           LoRA  XGBoost    Delta
+--------------------------------------------------------
+Multilabel F1                  0.8333   0.8347 -0.0014
+Risk accuracy                  0.9316   0.9292 + 0.0024
+False negative rate            0.0000   0.0206 -0.0206
+QUASI-ID F1                    0.5798   0.5809 -0.0011
+Hard negative precision        1.0000   0.9677 + 0.0323
+
+Per-label F1:
+Label                    LoRA  XGBoost    Delta
+------------------------------------------------
+CREDENTIAL             0.7047   0.7182 -0.0136
+DEMOGRAPHIC            0.9156   0.9139 + 0.0017
+DEVICE-ID              0.7813   0.7731 + 0.0081
+LOCATION               0.9587   0.9459 + 0.0128
+MEDICAL-CONTEXT        0.9283   0.9275 + 0.0008
+QUASI-ID               0.5798   0.5809 -0.0011
+ROUTINE                0.8705   0.8855 -0.0150
+WORKPLACE              0.9276   0.9327 -0.0051

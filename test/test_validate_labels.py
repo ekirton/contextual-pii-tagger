@@ -21,7 +21,7 @@ def _make_example(
     num: int = 1,
     labels: frozenset[SpanLabel] = frozenset({SpanLabel.LOCATION}),
     risk: RiskLevel = RiskLevel.MEDIUM,
-    rationale: str = "",
+    rationale: str = "Location creates re-identification risk.",
     source: str = "llm-augmented",
 ) -> Example:
     return Example(
@@ -124,12 +124,12 @@ class TestParseValidationResponse:
         assert results[0].risk == RiskLevel.HIGH
 
     def test_generates_rationale(self):
-        """Validation can add a label and provide rationale."""
+        """Validation can add a label and update rationale."""
         examples = [_make_example(
             1,
             labels=frozenset({SpanLabel.LOCATION}),
             risk=RiskLevel.MEDIUM,
-            rationale="",
+            rationale="Location creates risk.",
         )]
         response = _mock_validation_response(
             examples,
@@ -153,9 +153,9 @@ class TestParseValidationResponse:
         # LLM hallucinates sequential IDs instead of actual IDs
         response = [
             {"id": "train-00001", "labels": ["LOCATION"], "risk": "MEDIUM",
-             "rationale": "", "valid": True},
+             "rationale": "Location creates risk.", "valid": True},
             {"id": "train-00002", "labels": ["LOCATION"], "risk": "MEDIUM",
-             "rationale": "", "valid": True},
+             "rationale": "Location creates risk.", "valid": True},
         ]
         results = parse_validation_response(examples, response)
         assert len(results) == 2
@@ -167,9 +167,9 @@ class TestParseValidationResponse:
         examples = [_make_example(10), _make_example(11)]
         response = [
             {"id": "wrong-00001", "labels": ["LOCATION"], "risk": "MEDIUM",
-             "rationale": "", "valid": True},
+             "rationale": "Location creates risk.", "valid": True},
             {"id": "wrong-00002", "labels": ["LOCATION"], "risk": "MEDIUM",
-             "rationale": "", "valid": False},
+             "rationale": "Location creates risk.", "valid": False},
         ]
         results = parse_validation_response(examples, response)
         assert len(results) == 1
@@ -180,11 +180,11 @@ class TestParseValidationResponse:
         examples = [_make_example(1), _make_example(2), _make_example(3)]
         response = [
             {"id": "train-00001", "labels": ["LOCATION"], "risk": "MEDIUM",
-             "rationale": "", "valid": True},
+             "rationale": "Location creates risk.", "valid": True},
             {"id": "wrong-id", "labels": ["LOCATION"], "risk": "MEDIUM",
-             "rationale": "", "valid": True},
+             "rationale": "Location creates risk.", "valid": True},
             {"id": "train-00003", "labels": ["LOCATION"], "risk": "MEDIUM",
-             "rationale": "", "valid": True},
+             "rationale": "Location creates risk.", "valid": True},
         ]
         results = parse_validation_response(examples, response)
         # Only the 2 with matching IDs should survive; no positional fallback
@@ -195,14 +195,14 @@ class TestParseValidationResponse:
         examples = [_make_example(42), _make_example(43)]
         response = [
             {"id": "wrong-00001", "labels": ["LOCATION"], "risk": "MEDIUM",
-             "rationale": "", "valid": True},
+             "rationale": "Location creates risk.", "valid": True},
         ]
         results = parse_validation_response(examples, response)
         assert len(results) == 0
 
     def test_all_results_satisfy_invariants(self):
         examples = [
-            _make_example(1, frozenset({SpanLabel.LOCATION}), RiskLevel.MEDIUM, ""),
+            _make_example(1, frozenset({SpanLabel.LOCATION}), RiskLevel.MEDIUM, "Location creates risk."),
             _make_example(2, frozenset({SpanLabel.WORKPLACE, SpanLabel.LOCATION}),
                           RiskLevel.MEDIUM, "Work and location."),
         ]
@@ -210,6 +210,33 @@ class TestParseValidationResponse:
         results = parse_validation_response(examples, response)
         for r in results:
             assert isinstance(r, Example)
+
+    def test_drops_medium_single_label_no_rationale(self):
+        """Validator returning MEDIUM + 1 label + no rationale must be dropped."""
+        examples = [_make_example(1)]
+        response = [{
+            "id": "train-00001",
+            "labels": ["LOCATION"],
+            "risk": "MEDIUM",
+            "rationale": "",
+            "valid": True,
+        }]
+        results = parse_validation_response(examples, response)
+        assert len(results) == 0
+
+    def test_accepts_medium_single_label_with_rationale(self):
+        """Validator returning MEDIUM + 1 label + rationale must pass."""
+        examples = [_make_example(1)]
+        response = [{
+            "id": "train-00001",
+            "labels": ["LOCATION"],
+            "risk": "MEDIUM",
+            "rationale": "Location narrows identity.",
+            "valid": True,
+        }]
+        results = parse_validation_response(examples, response)
+        assert len(results) == 1
+        assert results[0].rationale == "Location narrows identity."
 
 
 class TestValidateLabels:

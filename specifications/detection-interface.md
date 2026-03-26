@@ -24,6 +24,7 @@ PIIDetector.from_pretrained(model_path: string) -> PIIDetector
 **ENSURES:**
 - Returns a PIIDetector instance with the model loaded and ready for inference.
 - The tokenizer is loaded from the same `model_path`.
+- On CUDA hardware, the model is loaded in 4-bit NF4 quantization via bitsandbytes, reducing memory usage. On MPS or CPU, the model loads in its native dtype.
 - No network calls are made after this method returns (if `model_path` is a local directory, no network calls are made at all; if it is a HuggingFace ID, the download occurs during this call only).
 
 **RAISES:**

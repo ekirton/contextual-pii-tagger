@@ -22,7 +22,7 @@ uv pip install -e ".[dev]"
 
 ```bash
 # Install Ollama: https://ollama.com/download
-ollama pull qwen2.5:7b
+ollama pull qwen2.5:3b
 ```
 
 **Hardware:**
@@ -50,7 +50,7 @@ The pipeline produces 20,000 synthetic examples in an 80:10:10 train/validation/
 ./scripts/generate-training-data.sh \
   --count 20000 \
   --seed 42 \
-  --model qwen2.5:7b \
+  --model qwen2.5:3b \
   --template-fraction 0.5 \
   --output ./data/
 ```
@@ -60,7 +60,7 @@ The pipeline produces 20,000 synthetic examples in an 80:10:10 train/validation/
 | `-c, --count` | Total examples to generate | 1000 |
 | `-s, --seed` | Random seed for reproducibility | none |
 | `-o, --output` | Output directory | `data/` |
-| `-m, --model` | Ollama model tag for LLM stages | `qwen2.5:7b` |
+| `-m, --model` | Ollama model tag for LLM stages | `qwen2.5:3b` |
 | `-t, --template-fraction` | Fraction from templates vs. LLM | 0.5 |
 | `--templates-only` | Skip LLM stages | off |
 

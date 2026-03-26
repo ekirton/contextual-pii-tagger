@@ -8,7 +8,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from contextual_pii_tagger.entities import DetectionResult
 from contextual_pii_tagger.output_parser import parse_output
@@ -57,6 +57,15 @@ class PIIDetector:
 
         tokenizer = AutoTokenizer.from_pretrained(model_path)
 
+        # 4-bit quantization on CUDA; native dtype elsewhere (MPS/CPU)
+        load_kwargs: dict = {"device_map": "auto", "torch_dtype": "auto"}
+        if torch.cuda.is_available():
+            load_kwargs["quantization_config"] = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.bfloat16,
+                bnb_4bit_quant_type="nf4",
+            )
+
         # Detect adapter vs. merged weights
         has_adapter = is_local and (path / "adapter_config.json").exists()
 
@@ -72,12 +81,18 @@ class PIIDetector:
             base_model_name = adapter_cfg.get(
                 "base_model_name_or_path", "microsoft/Phi-3-mini-4k-instruct"
             )
-            base_model = AutoModelForCausalLM.from_pretrained(base_model_name)
+            base_model = AutoModelForCausalLM.from_pretrained(
+                base_model_name, **load_kwargs
+            )
             model = PeftModel.from_pretrained(base_model, model_path)
         else:
-            model = AutoModelForCausalLM.from_pretrained(model_path)
+            model = AutoModelForCausalLM.from_pretrained(
+                model_path, **load_kwargs
+            )
 
         model.eval()
+        device = next(model.parameters()).device
+        print(f"Model loaded on device: {device}")
         return cls(model, tokenizer)
 
     # ── §1.2: detect ─────────────────────────────────────────────────────
@@ -107,10 +122,12 @@ class PIIDetector:
 def _generate(prompt_tokens: list[int], model: object, tokenizer: object) -> str:
     """Run greedy decoding on *prompt_tokens* and return decoded completion."""
     input_ids = torch.tensor([prompt_tokens], device=model.device)
+    attention_mask = torch.ones_like(input_ids)
 
     with torch.no_grad():
         output_ids = model.generate(
             input_ids,
+            attention_mask=attention_mask,
             max_new_tokens=256,
             do_sample=False,
             temperature=1.0,  # greedy (do_sample=False overrides)

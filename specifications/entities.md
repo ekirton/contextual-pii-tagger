@@ -57,7 +57,7 @@ The output of a single detection invocation. The model performs multilabel class
 **ENSURES:**
 - If `labels` is empty, `risk` is `LOW`.
 - If `risk` is `LOW`, `rationale` is an empty string.
-- If `risk` is `MEDIUM` or `HIGH` and `labels` contains two or more values, `rationale` is a non-empty string.
+- If `risk` is `MEDIUM` or `HIGH`, `rationale` is a non-empty string.
 
 **MAINTAINS:**
 - The DetectionResult is immutable after construction.

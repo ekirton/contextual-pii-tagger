@@ -9,7 +9,7 @@
 #   -c, --count    Total number of examples to generate (default: 1000)
 #   -s, --seed     Random seed for reproducibility (default: none)
 #   -o, --output   Output directory (default: data/)
-#   -m, --model    Ollama model tag for generation/validation (default: qwen2.5:7b)
+#   -m, --model    Ollama model tag for generation/validation (default: qwen2.5:3b)
 #   -t, --template-fraction  Fraction from templates vs LLM (default: 0.5)
 #   --templates-only  Skip LLM stages, use only template generation
 #   -h, --help     Show this help message
@@ -31,7 +31,7 @@ TEMPLATES_DIR="$PROJECT_ROOT/src/contextual_pii_tagger/data/templates"
 COUNT=1000
 SEED=""
 OUTPUT_DIR="$PROJECT_ROOT/data"
-MODEL="qwen2.5:7b"
+MODEL="qwen2.5:3b"
 TEMPLATE_FRACTION="0.5"
 TEMPLATES_ONLY=""
 

@@ -58,7 +58,7 @@ Example output for 2 examples:
 
 - If no labels apply: risk must be "LOW", rationale must be empty string ""
 - If risk is "LOW": rationale must be empty string ""
-- If risk is "MEDIUM" or "HIGH" and there are 2+ labels: rationale must be non-empty
+- If risk is "MEDIUM" or "HIGH": rationale must be non-empty
 
 ## Requirements
 

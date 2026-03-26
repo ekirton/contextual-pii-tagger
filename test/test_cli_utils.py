@@ -48,7 +48,7 @@ class TestCallOllama:
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
     def test_parses_json_array(self, mock_urlopen):
         mock_urlopen.return_value = _mock_ollama_response([{"text": "hello"}])
-        result = call_ollama("prompt", "qwen2.5:7b")
+        result = call_ollama("prompt", "qwen2.5:3b")
         assert result == [{"text": "hello"}]
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
@@ -57,7 +57,7 @@ class TestCallOllama:
         mock_urlopen.return_value = _mock_ollama_response(
             {"examples": [{"text": "hello"}]}
         )
-        result = call_ollama("prompt", "qwen2.5:7b")
+        result = call_ollama("prompt", "qwen2.5:3b")
         assert result == [{"text": "hello"}]
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
@@ -73,7 +73,7 @@ class TestCallOllama:
         resp.__enter__ = lambda s: s
         resp.__exit__ = MagicMock(return_value=False)
         mock_urlopen.return_value = resp
-        result = call_ollama("prompt", "qwen2.5:7b")
+        result = call_ollama("prompt", "qwen2.5:3b")
         assert result == [{"text": "hello"}]
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
@@ -88,14 +88,14 @@ class TestCallOllama:
         resp.__exit__ = MagicMock(return_value=False)
         mock_urlopen.return_value = resp
         with pytest.raises(RuntimeError, match="[Ee]mpty"):
-            call_ollama("prompt", "qwen2.5:7b")
+            call_ollama("prompt", "qwen2.5:3b")
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
     def test_connection_error_raises_runtime_error(self, mock_urlopen):
         import urllib.error
         mock_urlopen.side_effect = urllib.error.URLError("Connection refused")
         with pytest.raises(RuntimeError, match="Ollama"):
-            call_ollama("prompt", "qwen2.5:7b")
+            call_ollama("prompt", "qwen2.5:3b")
 
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
     def test_sends_correct_model(self, mock_urlopen):
@@ -109,7 +109,7 @@ class TestCallOllama:
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
     def test_sends_json_format(self, mock_urlopen):
         mock_urlopen.return_value = _mock_ollama_response([{"text": "hi"}])
-        call_ollama("test prompt", "qwen2.5:7b")
+        call_ollama("test prompt", "qwen2.5:3b")
         call_args = mock_urlopen.call_args
         req = call_args[0][0]
         payload = json.loads(req.data)
@@ -119,4 +119,4 @@ class TestCallOllama:
     def test_dict_without_array_raises(self, mock_urlopen):
         mock_urlopen.return_value = _mock_ollama_response({"status": "ok"})
         with pytest.raises(RuntimeError, match="no array"):
-            call_ollama("prompt", "qwen2.5:7b")
+            call_ollama("prompt", "qwen2.5:3b")

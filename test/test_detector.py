@@ -95,6 +95,53 @@ class TestFromPretrained:
             detector = PIIDetector.from_pretrained(str(model_dir))
             assert detector is not None
 
+    @patch("contextual_pii_tagger.detector.torch")
+    @patch("contextual_pii_tagger.detector.AutoTokenizer")
+    @patch("contextual_pii_tagger.detector.AutoModelForCausalLM")
+    def test_loads_with_4bit_quantization_on_cuda(
+        self, mock_model_cls, mock_tok_cls, mock_torch, tmp_path
+    ):
+        """ENSURES: on CUDA, from_pretrained passes a BitsAndBytesConfig with load_in_4bit=True."""
+        from contextual_pii_tagger.detector import PIIDetector
+
+        model_dir = tmp_path / "model"
+        model_dir.mkdir()
+        (model_dir / "config.json").write_text("{}")
+
+        mock_torch.cuda.is_available.return_value = True
+        mock_tok_cls.from_pretrained.return_value = _mock_tokenizer()
+        mock_model_cls.from_pretrained.return_value = _mock_model()
+
+        with patch("contextual_pii_tagger.detector.BitsAndBytesConfig") as mock_bnb:
+            mock_bnb.return_value = MagicMock()
+            PIIDetector.from_pretrained(str(model_dir))
+            mock_bnb.assert_called_once()
+            call_kwargs = mock_bnb.call_args[1]
+            assert call_kwargs["load_in_4bit"] is True
+            model_call_kwargs = mock_model_cls.from_pretrained.call_args[1]
+            assert "quantization_config" in model_call_kwargs
+
+    @patch("contextual_pii_tagger.detector.torch")
+    @patch("contextual_pii_tagger.detector.AutoTokenizer")
+    @patch("contextual_pii_tagger.detector.AutoModelForCausalLM")
+    def test_skips_quantization_without_cuda(
+        self, mock_model_cls, mock_tok_cls, mock_torch, tmp_path
+    ):
+        """ENSURES: on non-CUDA (MPS/CPU), no quantization config is passed."""
+        from contextual_pii_tagger.detector import PIIDetector
+
+        model_dir = tmp_path / "model"
+        model_dir.mkdir()
+        (model_dir / "config.json").write_text("{}")
+
+        mock_torch.cuda.is_available.return_value = False
+        mock_tok_cls.from_pretrained.return_value = _mock_tokenizer()
+        mock_model_cls.from_pretrained.return_value = _mock_model()
+
+        PIIDetector.from_pretrained(str(model_dir))
+        model_call_kwargs = mock_model_cls.from_pretrained.call_args[1]
+        assert "quantization_config" not in model_call_kwargs
+
 
 # ── §1.2: detect ────────────────────────────────────────────────────────
 
@@ -148,7 +195,7 @@ class TestDetect:
     def test_deterministic(self, mock_gen):
         """ENSURES: same input produces same output."""
         mock_gen.return_value = _valid_json_output(
-            labels=["LOCATION"], risk="MEDIUM", rationale=""
+            labels=["LOCATION"], risk="MEDIUM", rationale="Location narrowing risk."
         )
         detector = self._make_detector()
         r1 = detector.detect("Near the park.")

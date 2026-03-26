@@ -51,3 +51,9 @@ Offline operation is essential because the product's purpose is to prevent PII f
 **GIVEN** text containing quasi-identifier PII
 **WHEN** the text is analyzed
 **THEN** the result contains: the set of quasi-identifier categories present, an overall risk score (LOW/MEDIUM/HIGH), and a rationale string
+
+### AC-05: Quantized inference
+**GIVEN** a machine with a CUDA GPU
+**WHEN** the model is loaded for detection
+**THEN** the model loads in 4-bit quantized form, reducing memory usage and inference latency compared to full-precision loading
+*(Traces to PRD §6: "run on consumer hardware without specialized GPU")*

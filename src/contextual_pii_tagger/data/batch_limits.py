@@ -13,6 +13,7 @@ from __future__ import annotations
 
 # Usable output tokens after reserving headroom.
 _MODEL_TOKEN_BUDGET: dict[str, int] = {
+    "qwen2.5:3b": 2_400,
     "qwen2.5:7b": 3_200,
     "qwen2.5:14b": 3_200,
     "llama3.1:8b": 3_200,

@@ -24,7 +24,7 @@ def _make_example(split: str, num: int) -> Example:
         text=f"Example text for {split} {num}",
         labels=frozenset({SpanLabel.LOCATION}),
         risk=RiskLevel.MEDIUM,
-        rationale="",
+        rationale="Location creates re-identification risk.",
         is_hard_negative=False,
         split=split,
         domain="medical",
@@ -119,7 +119,7 @@ class TestInjectHardNegatives:
         mock_urlopen.return_value = _mock_ollama_response(
             _mock_hard_negative_texts(15)
         )
-        result = inject_hard_negatives(examples, ratio=0.10, model="qwen2.5:7b")
+        result = inject_hard_negatives(examples, ratio=0.10, model="qwen2.5:3b")
         total_hn = sum(1 for ex in result if ex.is_hard_negative)
         assert total_hn == 12
 
@@ -127,7 +127,7 @@ class TestInjectHardNegatives:
     def test_hard_negatives_have_correct_fields(self, mock_urlopen):
         examples = _make_dataset(train=9, val=0, test=0)
         mock_urlopen.return_value = _mock_ollama_response(_mock_hard_negative_texts(5))
-        result = inject_hard_negatives(examples, ratio=0.10, model="qwen2.5:7b")
+        result = inject_hard_negatives(examples, ratio=0.10, model="qwen2.5:3b")
         for ex in result:
             if ex.is_hard_negative:
                 assert ex.labels == frozenset()
@@ -139,7 +139,7 @@ class TestInjectHardNegatives:
     def test_hard_negatives_per_split(self, mock_urlopen):
         examples = _make_dataset(train=90, val=9, test=9)
         mock_urlopen.return_value = _mock_ollama_response(_mock_hard_negative_texts(15))
-        result = inject_hard_negatives(examples, ratio=0.10, model="qwen2.5:7b")
+        result = inject_hard_negatives(examples, ratio=0.10, model="qwen2.5:3b")
 
         by_split: dict[str, list] = {"train": [], "validation": [], "test": []}
         for ex in result:
@@ -154,7 +154,7 @@ class TestInjectHardNegatives:
     def test_ids_follow_pattern(self, mock_urlopen):
         examples = _make_dataset(train=9, val=0, test=0)
         mock_urlopen.return_value = _mock_ollama_response(_mock_hard_negative_texts(5))
-        result = inject_hard_negatives(examples, ratio=0.10, model="qwen2.5:7b")
+        result = inject_hard_negatives(examples, ratio=0.10, model="qwen2.5:3b")
         for ex in result:
             if ex.is_hard_negative:
                 assert ex.id.startswith("train-")
@@ -166,7 +166,7 @@ class TestInjectHardNegatives:
     def test_preserves_original_examples(self, mock_urlopen):
         examples = _make_dataset(train=9, val=0, test=0)
         mock_urlopen.return_value = _mock_ollama_response(_mock_hard_negative_texts(5))
-        result = inject_hard_negatives(examples, ratio=0.10, model="qwen2.5:7b")
+        result = inject_hard_negatives(examples, ratio=0.10, model="qwen2.5:3b")
         original_ids = {ex.id for ex in examples}
         result_ids = {ex.id for ex in result if not ex.is_hard_negative}
         assert original_ids == result_ids
@@ -174,7 +174,7 @@ class TestInjectHardNegatives:
     @patch("contextual_pii_tagger.data.cli_utils.urllib.request.urlopen")
     def test_zero_ratio_adds_nothing(self, mock_urlopen):
         examples = _make_dataset(train=10, val=1, test=1)
-        result = inject_hard_negatives(examples, ratio=0.0, model="qwen2.5:7b")
+        result = inject_hard_negatives(examples, ratio=0.0, model="qwen2.5:3b")
         assert len(result) == len(examples)
         assert not mock_urlopen.called
 
@@ -183,4 +183,4 @@ class TestInjectHardNegatives:
         import urllib.error
         mock_urlopen.side_effect = urllib.error.URLError("Connection refused")
         with pytest.raises(RuntimeError, match="Ollama"):
-            inject_hard_negatives(_make_dataset(train=9), ratio=0.10, model="qwen2.5:7b")
+            inject_hard_negatives(_make_dataset(train=9), ratio=0.10, model="qwen2.5:3b")
