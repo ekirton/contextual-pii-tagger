@@ -181,12 +181,15 @@ class TestTrainBaseline:
             result = predictor.predict("Some text to classify.")
             assert isinstance(result, DetectionResult)
 
-    def test_rationale_always_empty(self):
-        """ENSURES: XGBoost predictions have empty rationale."""
+    def test_rationale_nonempty_when_risk_medium_or_high(self):
+        """ENSURES: rationale is non-empty when risk is MEDIUM or HIGH (entities.md §3)."""
         train_data = [_make_example(idx=i) for i in range(1, 6)] + [
             _make_clean_example(idx=i) for i in range(6, 11)
         ]
         with _mock_optional_deps() as mod:
             predictor = mod.train_baseline(train_data)
             result = predictor.predict("I work at Acme Corp near downtown.")
-            assert result.rationale == ""
+            if result.risk in (RiskLevel.MEDIUM, RiskLevel.HIGH):
+                assert result.rationale != ""
+            else:
+                assert result.rationale == ""

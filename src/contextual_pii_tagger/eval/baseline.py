@@ -157,11 +157,14 @@ class XGBoostPredictor:
         if not labels:
             risk = RiskLevel.LOW
 
-        # DetectionResult requires rationale when risk >= MEDIUM and 2+ labels
+        # DetectionResult requires rationale when risk >= MEDIUM
         rationale = ""
-        if risk in (RiskLevel.MEDIUM, RiskLevel.HIGH) and len(labels) >= 2:
+        if risk in (RiskLevel.MEDIUM, RiskLevel.HIGH) and labels:
             sorted_labels = sorted(l.value for l in labels)
-            rationale = f"Multiple PII types detected: {', '.join(sorted_labels)}"
+            if len(sorted_labels) == 1:
+                rationale = f"PII type detected: {sorted_labels[0]}"
+            else:
+                rationale = f"Multiple PII types detected: {', '.join(sorted_labels)}"
 
         return DetectionResult(
             labels=frozenset(labels),
