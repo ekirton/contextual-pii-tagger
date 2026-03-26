@@ -58,6 +58,6 @@ Tier 3 labels are documented here for reference only and are not part of the mod
 
 | Tier | Responsibility | Rationale |
 |------|---------------|-----------|
-| 1 | Existing tools (Presidio, spaCy, regex) | Already solved; no need to duplicate |
-| 2 | This project's fine-tuned model | Unsolved gap — requires contextual reasoning |
+| 1 | Existing tools (Presidio, spaCy, regex) | Already solved; not part of this research |
+| 2 | This project (QLoRA model and XGBoost baseline) | Unsolved gap — requires contextual reasoning |
 | 3 | Not addressed | Different problem class; would expand training scope significantly |

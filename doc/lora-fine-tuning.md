@@ -290,4 +290,4 @@ The fine-tuned LoRA model was compared against an XGBoost baseline (spaCy embedd
 
 The LoRA model showed marginally better false negative rate (0.00 vs 0.02) and hard negative precision (1.00 vs 0.97), but did not meaningfully outperform XGBoost on the primary multilabel F1 metric. Per-label results were mixed, with no consistent advantage for either model.
 
-Given comparable accuracy, XGBoost was selected as the production model for its simplicity: faster training, no GPU requirement, and straightforward deployment as part of the Rust scanner binary.
+Given comparable accuracy, XGBoost is the simpler and more practical approach: faster training, no GPU requirement, and straightforward deployment.

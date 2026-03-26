@@ -16,7 +16,6 @@ Enumeration of Tier 2 quasi-identifier categories.
 
 - MAINTAINS: The set of valid values is fixed and matches the Tier 2 taxonomy.
 - MAINTAINS: Values are uppercase strings with hyphens as separators.
-- MAINTAINS: No value overlaps with Tier 1 labels (NAME, EMAIL, PHONE, ADDRESS, GOV-ID, FINANCIAL, DOB, BIOMETRIC).
 
 ---
 
@@ -64,52 +63,7 @@ The output of a single detection invocation. The model performs multilabel class
 
 ---
 
-## 4. Tier1Label
-
-Enumeration of Tier 1 direct identifier categories detected by redact-ner.
-
-### Values
-
-`NAME` | `EMAIL` | `PHONE` | `ADDRESS` | `GOV-ID` | `FINANCIAL` | `DOB` | `BIOMETRIC`
-
-### Contract
-
-- MAINTAINS: Values are uppercase strings with hyphens as separators.
-- MAINTAINS: No value overlaps with SpanLabel values (Section 1).
-- MAINTAINS: The set of valid values matches the Tier 1 taxonomy defined in `doc/pii-tiers.md`.
-
----
-
-## 5. Tier1Finding
-
-A single span-level finding from Tier 1 detection.
-
-### Fields
-
-| Field | Type | Constraints |
-|-------|------|-------------|
-| `label` | Tier1Label | Must be a valid Tier1Label value |
-| `text` | string | Non-empty; the matched text from the input |
-| `start` | integer | >= 0; character offset of the match start |
-| `end` | integer | > start; character offset of the match end (exclusive) |
-
-### Contract
-
-**REQUIRES:**
-- `label` is a valid Tier1Label value.
-- `text` is a non-empty string.
-- `start` >= 0.
-- `end` > `start`.
-
-**ENSURES:**
-- `end - start` equals the length of `text` in characters.
-
-**MAINTAINS:**
-- The Tier1Finding is immutable after construction.
-
----
-
-## 6. Example
+## 4. Example
 
 A single record in the dataset.
 
@@ -145,7 +99,7 @@ A single record in the dataset.
 
 ---
 
-## 7. EvaluationReport
+## 5. EvaluationReport
 
 Output of the evaluation pipeline.
 

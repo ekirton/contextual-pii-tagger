@@ -1,7 +1,6 @@
 # Data Generation Pipeline
 
 **Features:** F-02 (Synthetic Dataset Generation), F-06 (Human Review Workflow)
-**Requirements:** R-DAT-01, R-DAT-02, R-DAT-03, R-ETH-01
 
 ---
 

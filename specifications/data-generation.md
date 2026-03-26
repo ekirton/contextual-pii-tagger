@@ -1,7 +1,6 @@
 # Data Generation Specification
 
 **Architecture:** [data-generation-pipeline.md](../doc/architecture/data-generation-pipeline.md)
-**Features:** F-02, F-06
 
 ---
 

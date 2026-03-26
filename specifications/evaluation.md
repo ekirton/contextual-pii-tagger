@@ -1,7 +1,6 @@
 # Evaluation Specification
 
 **Architecture:** [evaluation-pipeline.md](../doc/architecture/evaluation-pipeline.md)
-**Features:** F-03
 
 ---
 

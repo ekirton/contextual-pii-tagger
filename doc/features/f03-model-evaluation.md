@@ -1,11 +1,10 @@
 # F-03: Model Evaluation
 
-**Priority:** P0
-**Requirements:** R-EVL-01, R-EVL-02
+**Priority:** Core
 
 ## What This Feature Does
 
-Measures the model's detection quality against the success metrics defined in the PRD and compares performance against an XGBoost baseline trained on the same dataset. Produces a structured evaluation report showing how the model performs on each metric and where it outperforms or underperforms the baseline.
+Measures the model's detection quality against the success metrics and compares performance against an XGBoost baseline trained on the same dataset. Produces a structured evaluation report showing how the model performs on each metric and where it outperforms or underperforms the baseline.
 
 The evaluation covers:
 
@@ -38,13 +37,11 @@ Without rigorous evaluation, there is no way to know whether the model actually 
 **GIVEN** the evaluation has been run on the test set
 **WHEN** the evaluation report is produced
 **THEN** it includes values for all five success metrics: Multilabel F1, Risk score accuracy, False negative rate, Quasi-ID F1, and Hard negative precision
-*(Traces to R-EVL-01)*
 
 ### AC-02: XGBoost baseline comparison
 **GIVEN** an XGBoost classifier trained on the same dataset with handcrafted features
 **WHEN** both models are evaluated on the same test set
 **THEN** the report shows side-by-side results for the fine-tuned model and the XGBoost baseline across all metrics
-*(Traces to R-EVL-02)*
 
 ### AC-03: Per-category breakdown
 **GIVEN** the evaluation has completed

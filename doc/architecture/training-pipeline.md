@@ -1,7 +1,6 @@
 # Training Pipeline
 
-**Features:** F-01 (Quasi-Identifier Detection), F-04 (Detection Interface)
-**Requirements:** R-DET-01, R-DET-02, R-DET-03
+**Features:** F-01 (Quasi-Identifier Detection)
 
 ---
 
@@ -107,7 +106,7 @@ For hard negatives (`is_hard_negative: true`), the completion contains an empty 
 | Training logs | Loss curves, learning rate schedule, and per-epoch validation metrics |
 | Merged model weights | Base model with adapter merged, ready for standalone inference without `peft` |
 
-The merged variant is produced after training as an export step. It enables inference without the `peft` library, which simplifies the Detection Interface dependency tree.
+The merged variant is produced after training as an export step. It enables inference without the `peft` library.
 
 ## 8. Validation During Training
 

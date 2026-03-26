@@ -1,7 +1,6 @@
 # Training Specification
 
 **Architecture:** [training-pipeline.md](../doc/architecture/training-pipeline.md)
-**Features:** F-01
 
 ---
 
@@ -40,7 +39,7 @@ Converts an Example record into a tokenized prompt-completion pair for training.
 - If the combined tokens exceed 1,024, the example is **skipped** (not truncated), and a warning is logged.
 
 **MAINTAINS:**
-- The prompt template is identical across all examples and identical to the inference template (detection-interface.md Section 2.1).
+- The prompt template is identical across all examples.
 
 ---
 

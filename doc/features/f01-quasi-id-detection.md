@@ -1,7 +1,6 @@
 # F-01: Quasi-Identifier Detection
 
-**Priority:** P0
-**Requirements:** R-DET-01, R-DET-02, R-DET-03
+**Priority:** Core
 
 ## What This Feature Does
 
@@ -36,19 +35,16 @@ Existing PII detection tools handle direct identifiers (names, emails, SSNs) eff
 **GIVEN** free text containing one or more quasi-identifiers from the taxonomy (LOCATION, WORKPLACE, ROUTINE, MEDICAL-CONTEXT, DEMOGRAPHIC, DEVICE-ID, CREDENTIAL, QUASI-ID)
 **WHEN** the text is analyzed
 **THEN** each quasi-identifier category present in the text is reported
-*(Traces to R-DET-01)*
 
 ### AC-02: Risk score assignment
 **GIVEN** free text that has been analyzed for quasi-identifiers
 **WHEN** the analysis completes
 **THEN** an overall risk score of LOW, MEDIUM, or HIGH is returned
-*(Traces to R-DET-02)*
 
 ### AC-03: Rationale for quasi-identifier combinations
 **GIVEN** free text containing two or more quasi-identifier categories whose combination increases re-identification risk
 **WHEN** the text is analyzed
 **THEN** a brief rationale explains how the combination of categories creates sensitivity
-*(Traces to R-DET-03)*
 
 ### AC-04: Clean text produces no findings
 **GIVEN** free text containing no PII or quasi-identifiers

@@ -1,7 +1,6 @@
 # Evaluation Pipeline
 
 **Features:** F-03 (Model Evaluation)
-**Requirements:** R-EVL-01, R-EVL-02
 
 ---
 

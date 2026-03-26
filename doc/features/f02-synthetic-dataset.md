@@ -1,7 +1,6 @@
 # F-02: Synthetic Dataset Generation
 
-**Priority:** P0
-**Requirements:** R-DAT-01, R-DAT-02, R-ETH-01
+**Priority:** Core
 
 ## What This Feature Does
 
@@ -34,19 +33,16 @@ Hard negatives are essential because without them the model would learn to flag 
 **GIVEN** the generation pipeline has completed
 **WHEN** the dataset is inspected
 **THEN** it contains 20,000 total examples split into 16,000 train, 2,000 validation, and 2,000 test
-*(Traces to R-DAT-01)*
 
 ### AC-02: Hard negatives in every split
 **GIVEN** any single split (train, validation, or test)
 **WHEN** the split is inspected
 **THEN** approximately 10% of examples are hard negatives — text that resembles PII but is not sensitive in context
-*(Traces to R-DAT-02)*
 
 ### AC-03: No real personal data
 **GIVEN** any example in the dataset
 **WHEN** the example is inspected
 **THEN** all names, locations, organizations, and other details are synthetically generated and do not correspond to real individuals
-*(Traces to R-ETH-01)*
 
 ### AC-04: Category labels and risk scores
 **GIVEN** any non-hard-negative example in the dataset

@@ -43,9 +43,6 @@ htmlcov/
 # mypy
 .mypy_cache/
 
-# Rust
-rust/target/
-
 # Distribution
 *.tar.gz
 *.zip

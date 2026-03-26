@@ -179,17 +179,6 @@ merge_adapter(
 )
 ```
 
-### Convert to GGUF (for the Rust binary)
-
-```bash
-git clone https://github.com/ggerganov/llama.cpp.git
-
-python llama.cpp/convert_hf_to_gguf.py \
-    ./output/merged-model \
-    --outfile ~/.cache/contextual-pii-tagger/model.gguf \
-    --outtype q4_k_m
-```
-
 ## 4. Evaluate
 
 ### Run evaluation
@@ -233,12 +222,5 @@ comparison = compare_models(report, baseline_report)
 ## 5. Run Tests
 
 ```bash
-# Python tests
 uv run pytest test/ -x -q
-
-# Rust tests (core logic)
-cd rust && cargo test
-
-# Rust tests (with Tier 1 integration)
-cd rust && cargo test --features tier1
 ```

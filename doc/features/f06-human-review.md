@@ -1,7 +1,6 @@
 # F-06: Human Review Workflow
 
-**Priority:** P1
-**Requirements:** R-DAT-03
+**Priority:** Core
 
 ## What This Feature Does
 
@@ -28,7 +27,6 @@ Synthetic data generation is imperfect. Category labels may be wrong or missing,
 **GIVEN** the synthetic dataset has been generated
 **WHEN** human review is complete
 **THEN** at least 1% of examples across all splits have been manually reviewed and any errors corrected
-*(Traces to R-DAT-03)*
 
 ### AC-02: Random selection
 **GIVEN** the examples selected for review

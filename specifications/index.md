@@ -8,15 +8,6 @@ Detailed specifications for each component, using Design by Contract (REQUIRES/E
 |----------|-------------|
 | [entities.md](entities.md) | SpanLabel, RiskLevel, DetectionResult, Example, EvaluationReport |
 
-## Runtime Component Specifications
-
-| Document | Description |
-|----------|-------------|
-| [detection-interface.md](detection-interface.md) | PIIDetector class: loading and detection |
-| [output-parser.md](output-parser.md) | Model output parsing, JSON repair, label validation |
-| [hook-script.md](hook-script.md) | Claude Code hook: payload extraction, exit codes (Python) |
-| [rust-binary.md](rust-binary.md) | Rust PII scanner binary: Tier 1 + Tier 2 detection, CLI contract |
-
 ## Pipeline Specifications
 
 | Document | Description |
